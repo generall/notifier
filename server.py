@@ -15,6 +15,7 @@ last = 0
 
 @app.route('/', methods=['GET'])
 def notify():
+    global last
     message = request.args.get('m')
     if not message:
         return "try ?m=your-message", 400
@@ -25,7 +26,7 @@ def notify():
 
     last = current_time
 
-    requests.post(
+    res = requests.post(
         f"https://api.telegram.org/bot{BOT_API}/sendMessage",
         json={
             "chat_id": CHAT_ID,
@@ -33,4 +34,7 @@ def notify():
             "disable_notification": False
         }
     )
+    if not res.ok:
+        return "Oops!", 500
+
     return 'Ok!', 200
